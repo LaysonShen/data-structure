@@ -1,64 +1,58 @@
 #include <fstream>
 #include <iostream>
-
-void bitin(const char *name, unsigned char **str)
+#include<sstream>
+#include<string>
+#include<bitset>
+#include<locale>
+#include<codecvt>
+using namespace std;
+void bitout(const char *filename, string str)
 {
-    std::ifstream f(name, std::ios::binary); //以二进制方式流式读取文件
-    int index = 0;                           //设置索引起点
-    f.seekg(0, f.end);                       //把指针指向文件结尾
-    int length = f.tellg();                  //获取文件长度
+    ofstream output(filename,ios::ate);
+    output.imbue(std::locale(output.getloc(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::little_endian>));
+    int length = str.length();
     for (int i = 0; i < length; i++)
     {
-        f.seekg(i, std::ios::beg); //指针指向第i+1个位置
-        unsigned char c = (unsigned char)f.get();
-        //将得到的字节存入 buffer 中
-        unsigned char *buf = new unsigned char[9 * sizeof(unsigned char)];
-        for (int i = 7; i >= 0; i--)
-        {
-            buf[7 - i] = (c & (1 << i) ? '1' : '0'); //按位计算再判断
-        }
-        buf[8] = '\0';
-        // 将 bufffer 写入 str 中去
-        str[index++] = buf;
-        delete[] buf;
+        output<<str[i];
+        if (i % 8 == 7)
+            output << ' ';
+        if ((i + 1) % (8 * 10) == 0)
+            output << endl;
     }
-    f.close();
-} //输入文件名、数组
-
-void bitout(const char *name, unsigned char **str)
+    output.close();
+    cout<<"写入成功!"<<endl;
+} //输入文件名、字符串
+string readfile(const char *filename)//读取文件的utf-8数值并返回一个储存了那个数值的字符串
 {
-    std::ofstream f(name, std::ios::binary | std::ios::ate);
-    int i = f.tellp();
-    while (*str)
+    ifstream input(filename,ios::binary);
+    ostringstream buf;
+    char ch;
+    cin.unsetf(ios::skipws);
+    while (buf&&input.get(ch))
     {
-        unsigned int buf = 0;
-        for (int i = 0; i < 8; i++)
-        {
-            // 根据str中得到的每个字节，保存到 buffer 中，进而写入文件中
-            buf |= (*(*str + i) - '0') << (7 - i);
-        }
-        f.seekp(i, f.beg);
-        f.write((const char *)buf, sizeof(unsigned int));
-        i--;
-        str = str + 1;
+        buf.put(ch);
     }
-} //输入文件名、数组
-
-// 调控输出，每八个换行
-void show(unsigned char **str)
+    input.close();
+    return buf.str();
+}
+string bitin(const char *filename)//文件名,保存二进制码的string
 {
-    int index = 0;
-    while (str)
+    string bit_str;
+    string str = readfile(filename);
+    int length = str.length();
+    for (int i = 0; i < length; i++)
     {
-        if (*str == NULL)
-            break;
-        else
-        {
-            printf("%s ", *str);
-            if (++index % 8 == 0)
-                std::cout << '\n';
-        }
-        str++;
+        bit_str.append(bitset<8>(str[i]).to_string());//由于文件是用utf-8编码的所以这里的二进制数字也是utf-8,每一个字符串保存在bit_str末尾
     }
-    std::cout << "\n";
+    return bit_str;
+}
+void display(string bit_str,int n)//字符串整齐打印,依次输入字符串与每行的组数
+{
+    int length=bit_str.length();
+    for(int i=0;i<length;i++)
+    {
+        cout<<bit_str[i];
+        if(i%8==7) cout<<' ';
+        if((i+1)%(8*n)==0) cout<<endl;
+    }
 }

@@ -1,13 +1,13 @@
-#include"bit_io.h"
-
+#include "bit_io.h"
 int main()
 {
-    unsigned char **string = new unsigned char*[256 * sizeof(unsigned char)] ;
-    std::cout << "以下是按位读取:" << std::endl;
-    bitin("信号与系统-第2章.pdf", string);
-    std::cout<<string;
-    show(string);
-    std::cout<<"接下来是按位输出:"<<std::endl;
-    bitout("信号与系统-第3章.txt", string);
+    string bit_str;//创建用于保存二进制字符串的string
+    const char *readfile="test1.txt";//输入文件名
+    const char *writefile="test2.txt";
+    cout<<"以下是读取文件并且当作二进制保存的、整齐打印功能:"<<endl;
+    bit_str=bitin(readfile);//储存生成的二进制数字字符串
+    display(bit_str,10);//调用整齐打印函数
+    cout<<'\n'<<"接下来实现把字符串保存到另一个文件当中的功能:"<<endl;
+    bitout(writefile,bit_str);
     return 0;
 }

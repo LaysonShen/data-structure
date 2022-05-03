@@ -1,0 +1,3 @@
+这是文件输入输出流的实验文件.
+This is the file for test in the file_io.
+牢骚太盛防肠断,风物长宜放眼量!
